@@ -1,8 +1,14 @@
 import pandas as pd
-import seaborn as sns
+import sqlite3
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
+from sqlalchemy import create_engine
 
+engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"
+                       .format(user="root",
+                               pw="12345",
+                               db="employee"))
+run = True
 
 columns = ['L-CORE', 'L-SURF', 'L-O2', 'L-BP', 'SURF-STBL', 'CORE-STBL', 'BP-STBL', 'COMFORT', 'DECISION']
 data = pd.read_csv('https://archive.ics.uci.edu/ml/machine-learning-databases/postoperative-patient-data/post-operative.data', names=columns, na_values="?")
@@ -35,13 +41,27 @@ data = data.dropna(how='any')
 
 data['COMFORT'] = data['COMFORT'].astype('float')
 
-train, test = train_test_split(data, random_state=0)
+
+data2 = data.to_sql('book_details', con=engine, if_exists='append')
 
 features = ['L-CORE', 'L-SURF', 'L-O2', 'L-BP', 'SURF-STBL', 'CORE-STBL', 'BP-STBL', 'COMFORT']
 target = ['DECISION']
 model = LinearRegression()
-model.fit(train[features], train[target])
-leave = model.predict([[1, 1, 1, 1, 1, 1, 1, 1]])
-print(model.coef_, model.intercept_)
+while run:
+    train, test = train_test_split(data, random_state=0)
+    model.fit(train[features], train[target])
+    tup1 = (1, 2, 3, 2, 1, 3, 2, 12, 3)
+    leave = model.predict([[tup1[0], tup1[1], tup1[2], tup1[3], tup1[4], tup1[5], tup1[6], tup1[7]]])
+    leave = int(leave)
+    print("The models prediction says", leave, ". The doctors prediction says", tup1[8])
+    tup1 = pd.DataFrame(tup1)
+    new_row = tup1
+    new_row = new_row.T
+    new_row.columns = columns
+    print(data.shape)
+    data = data.append(new_row, ignore_index=True)
+    print(data.shape)
+    sqlite3()
+    run = False
 
 
