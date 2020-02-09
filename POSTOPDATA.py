@@ -4,10 +4,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sqlalchemy import create_engine
 
-engine = create_engine("mysql+pymysql://{user}:{pw}@localhost/{db}"
-                       .format(user="root",
-                               pw="12345",
-                               db="employee"))
+engine = create_engine("postgres://hmtkaddpmvzihq:32053e9be16914fddb77094492892768be24e5c6661de44d2fc646e6dc6c33ef@ec2-184-72-235-80.compute-1.amazonaws.com:5432/d9sfvg60m4mcgs")
+
 run = True
 
 columns = ['L-CORE', 'L-SURF', 'L-O2', 'L-BP', 'SURF-STBL', 'CORE-STBL', 'BP-STBL', 'COMFORT', 'DECISION']
@@ -41,9 +39,11 @@ data = data.dropna(how='any')
 
 data['COMFORT'] = data['COMFORT'].astype('float')
 
+my_cursor = engine.connection.cursor()
 
-data2 = data.to_sql('book_details', con=engine, if_exists='append')
-
+data.to_sql('data', con=engine)
+print(data.dtypes)
+'''
 features = ['L-CORE', 'L-SURF', 'L-O2', 'L-BP', 'SURF-STBL', 'CORE-STBL', 'BP-STBL', 'COMFORT']
 target = ['DECISION']
 model = LinearRegression()
@@ -65,3 +65,4 @@ while run:
     run = False
 
 
+'''
