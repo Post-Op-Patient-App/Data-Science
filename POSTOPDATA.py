@@ -36,15 +36,12 @@ def run(one, two, three, four, five, six, seven, eight, nine):
     tup1 = np.asarray(tup1, dtype='float64')
     leave = model.predict([tup1[:-1]])
     tup1 = pd.DataFrame(tup1)
-    print(data.head())
     yhat = model.predict(test[features])
     acc = sum(yhat == test['DECISION']) / len(yhat)
-    print(acc)
     leave = np.round(leave)
     leave = leave.astype(float)
     leave = leave[0]
     leave = str(leave)
-    print(leave)
     tup1 = pd.DataFrame(tup1)
     new_row = tup1
     new_row = new_row.T
